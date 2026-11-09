@@ -1,0 +1,589 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>8th Pay Commission Fitment & Salary Calculator</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@500;600&display=swap" rel="stylesheet">
+  <!-- html2pdf library for direct clean PDF generation & download -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <div class="app-layout">
+    <!-- Header -->
+    <header class="app-header">
+      <div class="brand">
+        <div class="brand-icon">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+            <rect x="2" y="3" width="20" height="18" rx="3"></rect>
+            <line x1="2" y1="9" x2="22" y2="9"></line>
+            <line x1="9" y1="21" x2="9" y2="9"></line>
+          </svg>
+        </div>
+        <div>
+          <h1>8th Pay Commission Calculator</h1>
+          <p class="subtitle">All allowances calculated from Revised 8th CPC Basic Pay</p>
+        </div>
+      </div>
+      <div class="header-badges">
+        <span class="badge info-pill">Revised Basic Based Calculation</span>
+        <button id="resetBtn" class="secondary-btn" title="Reset all inputs to default">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"></path><path d="M3 3v5h5"></path></svg>
+          Reset Defaults
+        </button>
+      </div>
+    </header>
+
+    <!-- Main Grid -->
+    <main class="main-container">
+      <!-- Left Column: Navigation Tabs & Inputs -->
+      <section class="calculator-card">
+        <!-- Tab Navigation Bar -->
+        <nav class="tabs-nav" role="tablist" aria-label="Salary Components" id="tabsNav">
+          <button class="tab-btn active" data-tab="tab-basic" role="tab" id="btn-basic" aria-selected="true">
+            <span class="tab-icon">💼</span>
+            <span class="tab-label">Basic Pay</span>
+          </button>
+          <button class="tab-btn" data-tab="tab-fitment" role="tab" id="btn-fitment" aria-selected="false">
+            <span class="tab-icon">📈</span>
+            <span class="tab-label">Fitment Factor</span>
+          </button>
+          <button class="tab-btn" data-tab="tab-da" role="tab" id="btn-da" aria-selected="false">
+            <span class="tab-icon">📊</span>
+            <span class="tab-label">DA Allowance</span>
+          </button>
+          <button class="tab-btn" data-tab="tab-hra" role="tab" id="btn-hra" aria-selected="false">
+            <span class="tab-icon">🏠</span>
+            <span class="tab-label">HRA & Travel</span>
+          </button>
+          <button class="tab-btn" data-tab="tab-deductions" role="tab" id="btn-deductions" aria-selected="false">
+            <span class="tab-icon">🛡️</span>
+            <span class="tab-label">Deductions</span>
+          </button>
+          <!-- Special Add New Tab Button (+) -->
+          <button class="tab-btn add-tab-btn" id="openAddModalBtn" title="Add Custom Allowance or Deduction">
+            <span class="tab-icon">➕</span>
+            <span class="tab-label">Add Item</span>
+          </button>
+        </nav>
+
+        <!-- Tab Panels -->
+        <div class="tabs-content" id="tabsContent">
+          <!-- 1. Basic Pay Tab (No percentage option) -->
+          <div class="tab-panel active" id="tab-basic" role="tabpanel">
+            <div class="panel-header">
+              <div>
+                <h2>Current 7th CPC Basic Pay</h2>
+                <p class="panel-desc">Enter your current base salary. Basic Pay is an absolute amount without percentage factor.</p>
+              </div>
+            </div>
+
+            <div class="input-card primary-input-card">
+              <label for="basicPayInput" class="input-label">Current Basic Pay (₹ / month)</label>
+              <div class="input-wrapper main-num-wrap">
+                <span class="input-prefix">₹</span>
+                <input type="number" id="basicPayInput" value="44900" min="18000" step="100" placeholder="e.g. 44900" class="styled-input large-input">
+              </div>
+              <div class="quick-presets">
+                <span class="preset-label">Common 7th CPC Levels:</span>
+                <button type="button" class="preset-chip" onclick="setBasicPay(18000)">Level 1 (₹18,000)</button>
+                <button type="button" class="preset-chip" onclick="setBasicPay(35400)">Level 6 (₹35,400)</button>
+                <button type="button" class="preset-chip" onclick="setBasicPay(44900)">Level 7 (₹44,900)</button>
+                <button type="button" class="preset-chip" onclick="setBasicPay(56100)">Level 10 (₹56,100)</button>
+                <button type="button" class="preset-chip" onclick="setBasicPay(78800)">Level 12 (₹78,800)</button>
+              </div>
+            </div>
+
+            <div class="info-callout">
+              <span class="callout-icon">💡</span>
+              <div>
+                <strong>Pay Commission Transition Principle:</strong>
+                All subsequent allowances in the 8th Pay Commission (DA, HRA, TA, etc.) are computed directly from the <strong>Revised 8th CPC Basic Pay</strong>.
+              </div>
+            </div>
+          </div>
+
+          <!-- 2. Fitment Factor Tab -->
+          <div class="tab-panel" id="tab-fitment" role="tabpanel">
+            <div class="panel-header">
+              <div>
+                <h2>8th Pay Commission Fitment Factor</h2>
+                <p class="panel-desc">Applied to current basic pay to determine revised 8th CPC basic pay.</p>
+              </div>
+            </div>
+
+            <!-- Fitment Factor Multiplier / Rate -->
+            <div class="component-card">
+              <div class="component-top">
+                <div>
+                  <span class="comp-title">Fitment Multiplier / Hike</span>
+                  <span class="comp-sub">Select whether to specify as Fitment Ratio (number) or Percentage Hike</span>
+                </div>
+                <!-- Mode Toggle -->
+                <div class="toggle-switch-group">
+                  <button type="button" class="mode-btn active" data-target="fitmentMode" data-val="num">Ratio / Number</button>
+                  <button type="button" class="mode-btn" data-target="fitmentMode" data-val="pct">% Hike on Basic</button>
+                  <input type="hidden" id="fitmentMode" value="num">
+                </div>
+              </div>
+
+              <div class="input-wrapper">
+                <span class="input-prefix" id="fitmentPrefix">×</span>
+                <input type="number" id="fitmentValue" value="2.86" step="0.01" min="1" class="styled-input">
+                <span class="input-suffix" id="fitmentSuffix">Multiplier</span>
+              </div>
+
+              <div class="quick-presets">
+                <span class="preset-label">Projected Scenarios:</span>
+                <button type="button" class="preset-chip" onclick="setFitment(2.57, 'num')">2.57 (7th CPC factor)</button>
+                <button type="button" class="preset-chip" onclick="setFitment(2.86, 'num')">2.86 (Expected 8th CPC)</button>
+                <button type="button" class="preset-chip" onclick="setFitment(3.00, 'num')">3.00 (3.0× Hike)</button>
+                <button type="button" class="preset-chip" onclick="setFitment(3.68, 'num')">3.68 (Staff Side Demand)</button>
+              </div>
+            </div>
+
+            <!-- Revised Basic Pay Highlight -->
+            <div class="revised-basic-preview">
+              <span class="preview-label">Calculated Revised 8th CPC Basic Pay:</span>
+              <strong id="liveRevisedBasicPreview" class="preview-amount">₹1,28,414</strong>
+              <small class="preview-note">Every subsequent percentage will be calculated from this number.</small>
+            </div>
+          </div>
+
+          <!-- 3. Dearness Allowance (DA) Tab -->
+          <div class="tab-panel" id="tab-da" role="tabpanel">
+            <div class="panel-header">
+              <div>
+                <h2>Dearness Allowance (DA)</h2>
+                <p class="panel-desc">Calculated as a percentage of the new 8th Pay Commission Basic Pay (or fixed number).</p>
+              </div>
+            </div>
+
+            <!-- 8th CPC DA -->
+            <div class="component-card">
+              <div class="component-top">
+                <div>
+                  <span class="comp-title">8th CPC Dearness Allowance</span>
+                  <span class="comp-sub">Percentage of <strong>New 8th Basic</strong> or fixed amount (resets to 0% at launch or specified rate)</span>
+                </div>
+                <div class="toggle-switch-group">
+                  <button type="button" class="mode-btn" data-target="revDaMode" data-val="num">₹ In Numbers</button>
+                  <button type="button" class="mode-btn active" data-target="revDaMode" data-val="pct">% of New Basic</button>
+                  <input type="hidden" id="revDaMode" value="pct">
+                </div>
+              </div>
+              <div class="input-wrapper">
+                <span class="input-prefix" id="revDaPrefix">%</span>
+                <input type="number" id="revDaValue" value="0" step="0.5" min="0" class="styled-input">
+                <span class="input-suffix" id="revDaSuffix">% of New Basic</span>
+              </div>
+              <div class="quick-presets">
+                <span class="preset-label">Standard Initial Scenarios:</span>
+                <button type="button" class="preset-chip" onclick="setFieldValue('revDa', 0, 'pct')">0% (Launch rate)</button>
+                <button type="button" class="preset-chip" onclick="setFieldValue('revDa', 4, 'pct')">4% (First hike)</button>
+                <button type="button" class="preset-chip" onclick="setFieldValue('revDa', 8, 'pct')">8% (Second hike)</button>
+              </div>
+            </div>
+
+            <!-- Reference 7th CPC DA (for side-by-side comparison) -->
+            <div class="component-card subtle-ref-card">
+              <div class="component-top">
+                <div>
+                  <span class="comp-title">Current 7th CPC DA (For Comparison Reference)</span>
+                  <span class="comp-sub">Existing 7th CPC rate (~50% to 53% of old basic)</span>
+                </div>
+                <div class="toggle-switch-group">
+                  <button type="button" class="mode-btn" data-target="currDaMode" data-val="num">₹ In Numbers</button>
+                  <button type="button" class="mode-btn active" data-target="currDaMode" data-val="pct">% of Old Basic</button>
+                  <input type="hidden" id="currDaMode" value="pct">
+                </div>
+              </div>
+              <div class="input-wrapper">
+                <span class="input-prefix" id="currDaPrefix">%</span>
+                <input type="number" id="currDaValue" value="53" step="0.5" min="0" class="styled-input">
+                <span class="input-suffix" id="currDaSuffix">% of Old Basic</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- 4. HRA & Travel Tab -->
+          <div class="tab-panel" id="tab-hra" role="tabpanel">
+            <div class="panel-header">
+              <div>
+                <h2>House Rent Allowance (HRA) & Transport</h2>
+                <p class="panel-desc">Calculated directly from the new 8th Pay Commission Basic Pay.</p>
+              </div>
+            </div>
+
+            <!-- HRA -->
+            <div class="component-card">
+              <div class="component-top">
+                <div>
+                  <span class="comp-title">House Rent Allowance (HRA)</span>
+                  <span class="comp-sub">Calculated as % of <strong>New 8th Basic</strong> or fixed rupees</span>
+                </div>
+                <div class="toggle-switch-group">
+                  <button type="button" class="mode-btn" data-target="hraMode" data-val="num">₹ In Numbers</button>
+                  <button type="button" class="mode-btn active" data-target="hraMode" data-val="pct">% of New Basic</button>
+                  <input type="hidden" id="hraMode" value="pct">
+                </div>
+              </div>
+              <div class="input-wrapper">
+                <span class="input-prefix" id="hraPrefix">%</span>
+                <input type="number" id="hraValue" value="27" step="0.5" min="0" class="styled-input">
+                <span class="input-suffix" id="hraSuffix">% of New Basic</span>
+              </div>
+              <div class="quick-presets">
+                <span class="preset-label">Standard City Tiers:</span>
+                <button type="button" class="preset-chip" onclick="setFieldValue('hra', 30, 'pct')">X Class (30%)</button>
+                <button type="button" class="preset-chip" onclick="setFieldValue('hra', 27, 'pct')">X Class (27%)</button>
+                <button type="button" class="preset-chip" onclick="setFieldValue('hra', 18, 'pct')">Y Class (18%)</button>
+                <button type="button" class="preset-chip" onclick="setFieldValue('hra', 9, 'pct')">Z Class (9%)</button>
+              </div>
+            </div>
+
+            <!-- Transport Allowance (TA) -->
+            <div class="component-card">
+              <div class="component-top">
+                <div>
+                  <span class="comp-title">Transport Allowance (TA)</span>
+                  <span class="comp-sub">Fixed amount or % of <strong>New 8th Basic</strong></span>
+                </div>
+                <div class="toggle-switch-group">
+                  <button type="button" class="mode-btn active" data-target="taMode" data-val="num">₹ In Numbers</button>
+                  <button type="button" class="mode-btn" data-target="taMode" data-val="pct">% of New Basic</button>
+                  <input type="hidden" id="taMode" value="num">
+                </div>
+              </div>
+              <div class="input-wrapper">
+                <span class="input-prefix" id="taPrefix">₹</span>
+                <input type="number" id="taValue" value="3600" step="100" min="0" class="styled-input">
+                <span class="input-suffix" id="taSuffix">Rupees</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- 5. Deductions Tab -->
+          <div class="tab-panel" id="tab-deductions" role="tabpanel">
+            <div class="panel-header">
+              <div>
+                <h2>Monthly Deductions</h2>
+                <p class="panel-desc">Calculated from the new 8th Pay Commission Basic Pay and DA.</p>
+              </div>
+            </div>
+
+            <!-- NPS / Pension -->
+            <div class="component-card">
+              <div class="component-top">
+                <div>
+                  <span class="comp-title">NPS / Pension Contribution</span>
+                  <span class="comp-sub">Standard: 10% of (<strong>New Basic + New DA</strong>)</span>
+                </div>
+                <div class="toggle-switch-group">
+                  <button type="button" class="mode-btn" data-target="npsMode" data-val="num">₹ In Numbers</button>
+                  <button type="button" class="mode-btn active" data-target="npsMode" data-val="pct">% of (New Basic+DA)</button>
+                  <input type="hidden" id="npsMode" value="pct">
+                </div>
+              </div>
+              <div class="input-wrapper">
+                <span class="input-prefix" id="npsPrefix">%</span>
+                <input type="number" id="npsValue" value="10" step="0.5" min="0" class="styled-input">
+                <span class="input-suffix" id="npsSuffix">% of New Basic+DA</span>
+              </div>
+            </div>
+
+            <!-- CGHS / Health & Insurance -->
+            <div class="component-card">
+              <div class="component-top">
+                <div>
+                  <span class="comp-title">CGHS / Health Scheme & CGEGIS</span>
+                  <span class="comp-sub">Fixed monthly health scheme or percentage of new basic</span>
+                </div>
+                <div class="toggle-switch-group">
+                  <button type="button" class="mode-btn active" data-target="cghsMode" data-val="num">₹ In Numbers</button>
+                  <button type="button" class="mode-btn" data-target="cghsMode" data-val="pct">% of New Basic</button>
+                  <input type="hidden" id="cghsMode" value="num">
+                </div>
+              </div>
+              <div class="input-wrapper">
+                <span class="input-prefix" id="cghsPrefix">₹</span>
+                <input type="number" id="cghsValue" value="650" step="50" min="0" class="styled-input">
+                <span class="input-suffix" id="cghsSuffix">Rupees</span>
+              </div>
+            </div>
+
+            <!-- Other Deductions / Professional Tax -->
+            <div class="component-card">
+              <div class="component-top">
+                <div>
+                  <span class="comp-title">Professional Tax & Misc Deductions</span>
+                  <span class="comp-sub">Monthly state tax or deductions</span>
+                </div>
+                <div class="toggle-switch-group">
+                  <button type="button" class="mode-btn active" data-target="miscDedMode" data-val="num">₹ In Numbers</button>
+                  <button type="button" class="mode-btn" data-target="miscDedMode" data-val="pct">% of New Basic</button>
+                  <input type="hidden" id="miscDedMode" value="num">
+                </div>
+              </div>
+              <div class="input-wrapper">
+                <span class="input-prefix" id="miscDedPrefix">₹</span>
+                <input type="number" id="miscDedValue" value="200" step="50" min="0" class="styled-input">
+                <span class="input-suffix" id="miscDedSuffix">Rupees</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Navigation Buttons Bottom -->
+        <div class="tab-footer-nav">
+          <button type="button" id="prevTabBtn" class="nav-direction-btn" disabled>
+            &larr; Previous Tab
+          </button>
+          <span id="tabStepIndicator" class="step-indicator">Tab 1 of 5</span>
+          <button type="button" id="nextTabBtn" class="nav-direction-btn">
+            Next Tab &rarr;
+          </button>
+        </div>
+      </section>
+
+      <!-- Right Column: Live Comparison & Summary Card -->
+      <aside class="summary-card" id="summaryCardElement">
+        <div class="summary-top">
+          <h3>Salary Revision Summary</h3>
+          <span class="live-indicator"><span class="dot"></span> Live Updated</span>
+        </div>
+
+        <!-- Primary Highlight Card: Revised 8th CPC In-Hand & Gross -->
+        <div class="result-hero-box">
+          <div class="hero-item">
+            <span class="hero-label">Estimated 8th CPC Gross Pay</span>
+            <span class="hero-value" id="dispRevGross">₹0</span>
+          </div>
+          <div class="hero-divider"></div>
+          <div class="hero-item">
+            <span class="hero-label">Estimated 8th CPC Net In-Hand</span>
+            <span class="hero-value text-accent" id="dispRevNet">₹0</span>
+          </div>
+          <div class="hero-badge" id="dispHikeBadge">+₹0 (+0.0% hike)</div>
+        </div>
+
+        <!-- Comparison Table (7th CPC vs 8th CPC) -->
+        <div class="comparison-container">
+          <div class="table-title">Breakdown: 7th vs 8th CPC (Monthly)</div>
+          <table class="comparison-table">
+            <thead>
+              <tr>
+                <th>Component</th>
+                <th>Current (7th)</th>
+                <th>Revised (8th)</th>
+              </tr>
+            </thead>
+            <tbody id="comparisonTableBody">
+              <tr>
+                <td><strong>Basic Pay</strong></td>
+                <td id="rowCurrBasic">₹0</td>
+                <td id="rowRevBasic" class="highlight-val">₹0</td>
+              </tr>
+              <tr>
+                <td>Dearness Allowance (DA)</td>
+                <td id="rowCurrDa">₹0</td>
+                <td id="rowRevDa">₹0</td>
+              </tr>
+              <tr>
+                <td>House Rent Allowance (HRA)</td>
+                <td id="rowCurrHra">₹0</td>
+                <td id="rowRevHra">₹0</td>
+              </tr>
+              <tr>
+                <td>Transport Allowance (TA)</td>
+                <td id="rowCurrTa">₹0</td>
+                <td id="rowRevTa">₹0</td>
+              </tr>
+              <!-- Dynamic Rows inserted here for Custom Items -->
+              <tr id="dynamicRowsAnchor" style="display:none;"></tr>
+              <tr class="gross-row">
+                <td><strong>Total Gross Salary</strong></td>
+                <td id="rowCurrGross"><strong>₹0</strong></td>
+                <td id="rowRevGrossTotal"><strong>₹0</strong></td>
+              </tr>
+              <tr class="deduction-row">
+                <td>Total Deductions (NPS, CGHS...)</td>
+                <td id="rowCurrDeductions">-₹0</td>
+                <td id="rowRevDeductions">-₹0</td>
+              </tr>
+              <tr class="net-row">
+                <td><strong>Net In-Hand Salary</strong></td>
+                <td id="rowCurrNet"><strong>₹0</strong></td>
+                <td id="rowRevNetTotal"><strong>₹0</strong></td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <!-- Annual Impact Projection -->
+        <div class="annual-card">
+          <div class="annual-item">
+            <span class="sub-text">Current Annual Gross</span>
+            <strong id="dispCurrAnnual">₹0 / yr</strong>
+          </div>
+          <div class="annual-item">
+            <span class="sub-text">Revised Annual Gross</span>
+            <strong id="dispRevAnnual" class="text-accent">₹0 / yr</strong>
+          </div>
+          <div class="annual-item gain-item">
+            <span class="sub-text">Annual Increase</span>
+            <strong id="dispAnnualGain" class="text-success">+₹0 / yr</strong>
+          </div>
+        </div>
+
+        <!-- Action Button Group: Download PDF & Print -->
+        <div class="action-btn-group">
+          <button type="button" class="primary-action-btn" id="downloadPdfBtn">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+              <polyline points="7 10 12 15 17 10"></polyline>
+              <line x1="12" y1="15" x2="12" y2="3"></line>
+            </svg>
+            <span id="pdfBtnText">Download Statement PDF</span>
+          </button>
+
+          <button type="button" class="secondary-print-btn" id="browserPrintBtn" title="Direct browser print dialog">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 6 2 18 2 18 9"></polyline><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"></path><rect x="6" y="14" width="12" height="8"></rect></svg>
+            Print
+          </button>
+        </div>
+      </aside>
+    </main>
+
+    <!-- Hidden Dedicated Printable Statement Template for PDF Generation -->
+    <div id="printSalaryStatement" class="printable-salary-statement" style="display: none;">
+      <div class="statement-header">
+        <div class="statement-title-wrap">
+          <h2>8TH CENTRAL PAY COMMISSION (CPC)</h2>
+          <h3>OFFICIAL SALARY REVISION &amp; FITMENT STATEMENT</h3>
+          <p class="statement-subtitle">Estimated Comparative Calculation Statement</p>
+        </div>
+        <div class="statement-date-wrap">
+          <span id="printStatementDate">Date: </span>
+          <span>Status: Projected Estimation</span>
+        </div>
+      </div>
+
+      <div class="statement-meta-box">
+        <div class="meta-col">
+          <div><span class="meta-title">Pay Level / Base:</span> <strong id="printMetaLevel">Level 7</strong></div>
+          <div><span class="meta-title">Current Basic Pay (7th CPC):</span> <strong id="printMetaOldBasic">₹44,900</strong></div>
+        </div>
+        <div class="meta-col">
+          <div><span class="meta-title">Fitment Factor:</span> <strong id="printMetaFitment">2.86</strong></div>
+          <div><span class="meta-title">Revised Basic Pay (8th CPC):</span> <strong id="printMetaNewBasic">₹1,28,414</strong></div>
+        </div>
+      </div>
+
+      <table class="statement-table">
+        <thead>
+          <tr>
+            <th>Salary Component</th>
+            <th style="text-align: right;">7th CPC (Current)</th>
+            <th style="text-align: right;">8th CPC (Revised)</th>
+            <th style="text-align: right;">Net Difference</th>
+          </tr>
+        </thead>
+        <tbody id="printTableBody">
+          <!-- Populated by JavaScript before printing/PDF generation -->
+        </tbody>
+      </table>
+
+      <div class="statement-annual-box">
+        <div class="annual-grid">
+          <div>
+            <span class="ann-label">Current Annual Gross:</span>
+            <strong id="printCurrAnnual">₹0</strong>
+          </div>
+          <div>
+            <span class="ann-label">Revised Annual Gross:</span>
+            <strong id="printRevAnnual">₹0</strong>
+          </div>
+          <div>
+            <span class="ann-label">Net Annual Gain:</span>
+            <strong id="printAnnualGain" style="color: #16a34a;">+₹0</strong>
+          </div>
+        </div>
+      </div>
+
+      <div class="statement-footer">
+        <p>This statement is generated electronically for pay estimation and financial planning purposes based on 8th Pay Commission fitment parameters.</p>
+      </div>
+    </div>
+
+    <!-- Modal for adding custom charge / allowance / deduction -->
+    <div class="modal-backdrop" id="addItemModal">
+      <div class="modal-card">
+        <div class="modal-header">
+          <div>
+            <h3>Add Custom Salary Component</h3>
+            <p class="modal-subtitle">Add any allowance or deduction to calculate from the new Basic Pay.</p>
+          </div>
+          <button type="button" class="close-modal-btn" id="closeModalBtn">&times;</button>
+        </div>
+
+        <form id="addItemForm">
+          <!-- Section 1: Item Details -->
+          <div class="modal-section">
+            <label class="modal-label" for="newItemName">Charge / Component Name</label>
+            <input type="text" id="newItemName" class="styled-input modal-input" placeholder="e.g. Children Education Allowance, Hardship Pay, Union Fee" required>
+          </div>
+
+          <!-- Section 2: Charge Type: Plus (Allowance) vs Minus (Deduction) -->
+          <div class="modal-section">
+            <label class="modal-label">Charge Type (Plus or Minus)</label>
+            <div class="type-selector-grid">
+              <label class="type-option-card active" id="typePlusLabel">
+                <input type="radio" name="itemType" value="plus" checked>
+                <div class="type-badge plus-badge">➕ PLUS (Allowance)</div>
+                <div class="type-desc">Adds to Gross Salary (e.g. Special Allowance, Risk Pay)</div>
+              </label>
+              <label class="type-option-card" id="typeMinusLabel">
+                <input type="radio" name="itemType" value="minus">
+                <div class="type-badge minus-badge">➖ MINUS (Deduction)</div>
+                <div class="type-desc">Deducted from Salary (e.g. Welfare Fund, Income Tax)</div>
+              </label>
+            </div>
+          </div>
+
+          <!-- Section 3: Value and Option (Percentage or Number) -->
+          <div class="modal-section">
+            <div class="modal-row-header">
+              <label class="modal-label" for="newItemValue">Amount / Rate</label>
+              <div class="toggle-switch-group">
+                <button type="button" class="mode-btn" id="modalModeNumBtn">₹ In Numbers</button>
+                <button type="button" class="mode-btn active" id="modalModePctBtn">% of New Basic</button>
+              </div>
+            </div>
+            <div class="input-wrapper">
+              <span class="input-prefix" id="modalInputPrefix">%</span>
+              <input type="number" id="newItemValue" class="styled-input" placeholder="e.g. 5 or 2000" step="0.5" required>
+              <span class="input-suffix" id="modalInputSuffix">% of New Basic</span>
+            </div>
+          </div>
+
+          <div class="modal-actions">
+            <button type="button" class="secondary-btn" id="cancelModalBtn">Cancel</button>
+            <button type="submit" class="submit-modal-btn">Add Component &amp; Recalculate</button>
+          </div>
+        </form>
+      </div>
+    </div>
+
+    <!-- Footer -->
+    <footer class="app-footer">
+      <p>Designed for Central & State Government Employees based on 7th and projected 8th Pay Commission parameters.</p>
+    </footer>
+  </div>
+
+  <script src="app.js"></script>
+</body>
+</html>
